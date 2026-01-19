@@ -1,6 +1,6 @@
 package com.karas7171.atmossystem.comand;
 
-import com.karas7171.atmossystem.atmos.AtmosManager;
+import com.karas7171.atmossystem.core.AtmosManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -9,7 +9,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
@@ -32,11 +31,15 @@ public class AtmosInitCommand {
 
         ServerPlayer player = source.getPlayerOrException();
         Level level = player.level();
-        BlockPos startPos = player.blockPosition();
-        AtmosManager.get().scanFullZone(level, startPos);
+        BlockPos pos = player.blockPosition();
+        if (AtmosManager.get().getZone(pos) != null) {
+            source.sendFailure(Component.literal("Зона уже инициализирована"));
+            return 0;
+        }
+        AtmosManager.get().createAndAddZone(level, pos);
 
         source.sendSuccess(
-                () -> Component.literal("Зона проверяется и инициализируется, на позиции: " + startPos.toShortString()),
+                () -> Component.literal("Зона проверяется и инициализируется, на позиции: " + pos.toShortString()),
                 false
         );
 

@@ -1,6 +1,7 @@
 package com.karas7171.atmossystem.comand;
 
-import com.karas7171.atmossystem.atmos.AtmosManager;
+import com.karas7171.atmossystem.core.AtmosManager;
+import com.karas7171.atmossystem.core.AtmosZone;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -10,7 +11,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 
 public class AtmosScan {
 
@@ -30,10 +30,14 @@ public class AtmosScan {
         CommandSourceStack source = context.getSource();
 
         ServerPlayer player = source.getPlayerOrException();
-        Level level = player.level();
         BlockPos startPos = player.blockPosition();
-        AtmosManager.get().reportCellInfo(startPos, source);
+        AtmosZone zone = AtmosManager.get().getZone(startPos);
+        if (zone == null) {
+            source.sendFailure(Component.literal("Зона атмосферы для этой позиции не найдена"));
+            return 0;
+        }
 
+        zone.reportCellInfo(startPos, source);
 
         return Command.SINGLE_SUCCESS;
     }
