@@ -3,7 +3,6 @@ package com.karas7171.atmossystem.comand;
 import com.karas7171.atmossystem.core.AtmosManager;
 import com.karas7171.atmossystem.core.logic.AtmosLogic;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -47,7 +46,6 @@ public class AtmosInitCommand {
         if (showTime) {
             double time = (end - start) / 1_000_000_000.0;
 
-            String timeMessage = "";
             if (time >= 60) {
                 int minute = (int) (time / 60);
                 double second = (time % 60);
