@@ -48,22 +48,6 @@ public class AtmosZone {
         this.airBlocks = airBlocks;
     }
 
-    public AtmosZone(AtmosZone original, int newID) {
-        this.ID = newID;
-
-        this.bounds = original.bounds;
-        this.sizeX = original.sizeX;
-        this.sizeZ = original.sizeZ;
-        this.sizeY = original.sizeY;
-
-        this.pressure = Arrays.copyOf(original.pressure, original.pressure.length);
-        this.temperature = Arrays.copyOf(original.temperature, original.temperature.length);
-        this.oxygen = Arrays.copyOf(original.oxygen, original.oxygen.length);
-        this.solid = Arrays.copyOf(original.solid, original.solid.length);
-
-        this.airBlocks = new ArrayList<>(original.airBlocks);
-    }
-
     private int getIndex(BlockPos pos) {
         int relX =  pos.getX() - bounds.minX();
         int relY =  pos.getY() - bounds.minY();
@@ -91,5 +75,9 @@ public class AtmosZone {
         message.append("Температура: ").append(temperature[index]).append(" К\n");
         message.append("Кислород: ").append(oxygen[index]).append(" моль");
         source.sendSuccess(() -> Component.literal(message.toString()), false);
+    }
+
+    public int getID() {
+        return ID;
     }
 }
