@@ -6,5 +6,5 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public interface AtmosLogic {
-    List<BlockPos> createAtmosZoneAirBlocks(BlockPos pos, Predicate<BlockPos> predicate);
+    List<BlockPos> createAtmosZoneAirBlocks(BlockPos pos, Predicate<BlockPos> predicate, AtmosProgressListener listener);
 }

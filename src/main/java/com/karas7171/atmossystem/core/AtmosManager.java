@@ -1,6 +1,7 @@
 package com.karas7171.atmossystem.core;
 
 import com.karas7171.atmossystem.core.logic.AtmosLogic;
+import com.karas7171.atmossystem.core.logic.AtmosProgressListener;
 import com.karas7171.atmossystem.core.logic.AxialLogic;
 import com.karas7171.atmossystem.core.logic.BFSLogic;
 import net.minecraft.core.BlockPos;
@@ -57,8 +58,8 @@ public class AtmosManager {
         return null;
     }
 
-    public void createAndAddZone(Level level, BlockPos pos, AtmosLogic atmosLogic) {
-        List<BlockPos> airBlocks = zoneFactory.findAirBlocks(level, pos, atmosLogic);
+    public void createAndAddZone(Level level, BlockPos pos, AtmosLogic atmosLogic, AtmosProgressListener listener) {
+        List<BlockPos> airBlocks = zoneFactory.findAirBlocks(level, pos, atmosLogic, listener);
         int ID = nextID++;
         AtmosZone zone = zoneFactory.createAtmosZone(level, pos, (l, p) -> airBlocks, ID);
         atmosZones.put(ID, zone);

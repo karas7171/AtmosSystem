@@ -1,6 +1,7 @@
 package com.karas7171.atmossystem.core;
 
 import com.karas7171.atmossystem.core.logic.AtmosLogic;
+import com.karas7171.atmossystem.core.logic.AtmosProgressListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,8 +25,8 @@ public class AtmosZoneFactory {
         );
     }
 
-    public List<BlockPos> findAirBlocks(Level level, BlockPos startPos, AtmosLogic logic) {
-        return logic.createAtmosZoneAirBlocks(startPos, pos -> isAirBlock(level, pos));
+    public List<BlockPos> findAirBlocks(Level level, BlockPos startPos, AtmosLogic logic, AtmosProgressListener listener) {
+        return logic.createAtmosZoneAirBlocks(startPos, pos -> isAirBlock(level, pos), listener);
     }
 
     private boolean isAirBlock(Level level, BlockPos pos) {

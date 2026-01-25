@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 
 public class BFSLogic implements AtmosLogic {
     @Override
-    public List<BlockPos> createAtmosZoneAirBlocks(BlockPos pos, Predicate<BlockPos> predicate) {
+    public List<BlockPos> createAtmosZoneAirBlocks(BlockPos pos, Predicate<BlockPos> predicate, AtmosProgressListener listener) {
         List<BlockPos> airBlocks = new ArrayList<>();
         Deque<BlockPos> queue = new ArrayDeque<>();
         Set<BlockPos> visited = new HashSet<>();
@@ -28,6 +28,10 @@ public class BFSLogic implements AtmosLogic {
                 airBlocks.add(next);
                 queue.add(next);
                 visited.add(next);
+
+                if (listener != null) {
+                    listener.onBlockFound(current, next);
+                }
             }
         }
         return airBlocks;
