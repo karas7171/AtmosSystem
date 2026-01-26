@@ -7,9 +7,7 @@ import com.karas7171.atmossystem.core.logic.BFSLogic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AtmosManager {
     private final Map<Integer, AtmosZone> atmosZones = new HashMap<>();

@@ -43,23 +43,27 @@ public class AxialLogic implements AtmosLogic {
         List<BlockPos> airBLocks = new ArrayList<>();
 
         BlockPos buffer = move(pos, posDir);
+        BlockPos prev = pos;
+
         while (predicate.test(buffer)) {
             airBLocks.add(buffer);
-            BlockPos prev = buffer;
-            buffer = move(buffer, posDir);
             if (listener != null) {
                 listener.onBlockFound(prev, buffer);
             }
+            prev = buffer;
+            buffer = move(buffer, posDir);
+
         }
 
         buffer = move(pos, negDir);
+        prev = pos;
         while (predicate.test(buffer)) {
             airBLocks.add(buffer);
-            BlockPos prev = buffer;
-            buffer = move(buffer, negDir);
             if (listener != null) {
                 listener.onBlockFound(prev, buffer);
             }
+            prev = buffer;
+            buffer = move(buffer, negDir);
         }
         return airBLocks;
     }

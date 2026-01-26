@@ -19,31 +19,34 @@ import net.minecraft.world.level.Level;
 public class AtmosInitCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> register() {
         var axial = Commands.literal("axial")
-                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), false, false))
+                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), false, false, false))
                 .then(Commands.literal("visual")
-                        .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), false, true))
-                        .then(Commands.literal("bench")
-                                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), true, true))))
+                        .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), false, true, false))
+                        .then(Commands.literal("slow")
+                                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), false, true, true))
+                                .then(Commands.literal("bench")
+                                        .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), true, true, true)))))
                 .then(Commands.literal("bench")
-                        .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), true, false)));
+                        .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getAxialLogic(), true, false, false)));
 
         var visual = Commands.literal("visual")
-                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), false, true))
-                .then(Commands.literal("bench")
-                        .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), true, true)));
+                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), false, true, false))
+                .then(Commands.literal("slow")
+                        .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), false, true, true))
+                        .then(Commands.literal("bench")
+                                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), true, true, true))));
 
         var bench = Commands.literal("bench")
-                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), true, false));
-
+                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), true, false, false));
 
         return Commands.literal("init")
-                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), false, false))
+                .executes(ctx -> executeInitSmart(ctx, AtmosManager.get().getBFSLogic(), false, false, false))
                 .then(axial)
                 .then(visual)
                 .then(bench);
     }
 
-    private static int executeInitSmart(CommandContext<CommandSourceStack> context, AtmosLogic logic, boolean showTime, boolean isVisual) throws CommandSyntaxException {
+    private static int executeInitSmart(CommandContext<CommandSourceStack> context, AtmosLogic logic, boolean showTime, boolean isVisual, boolean isSlow) throws CommandSyntaxException {
         CommandSourceStack source = context.getSource();
 
         ServerPlayer player = source.getPlayerOrException();
@@ -55,9 +58,14 @@ public class AtmosInitCommand {
             return 0;
         }
 
-        AtmosProgressListener listener = isVisual
-                ? (current, next) -> AtmosVisualizer.visualize(serverLevel, current, next)
-                : null;
+        AtmosProgressListener listener = null;
+
+        if (isVisual) {
+            AtmosVisualizer.clearVISUAL_QUEUE();
+            listener = isSlow
+                ? (current, next) -> AtmosVisualizer.addVisualTask(next, serverLevel)
+                : (current, next) -> AtmosVisualizer.visualize(serverLevel, current, next);
+            }
 
         long start = System.nanoTime();
         AtmosManager.get().createAndAddZone(level, pos, logic, listener);
