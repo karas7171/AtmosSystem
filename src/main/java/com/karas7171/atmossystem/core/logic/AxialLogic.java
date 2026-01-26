@@ -15,16 +15,23 @@ public class AxialLogic implements AtmosLogic {
         if (predicate.test(pos)) airBlocks.add(pos);
 
         airBlocks.addAll((scanLine(pos, AxisDirection.Y_POS, AxisDirection.Y_NEG, predicate, listener)));
+
         List<BlockPos> foundZBlock = new ArrayList<>(scanLine(pos, AxisDirection.Z_POS, AxisDirection.Z_NEG, predicate, listener));
         airBlocks.addAll(foundZBlock);
         for (BlockPos zPos : foundZBlock) {
             airBlocks.addAll(scanLine(zPos, AxisDirection.Y_POS, AxisDirection.Y_NEG, predicate, listener));
         }
+
         List<BlockPos> foundXBlock = new ArrayList<>(scanLine(pos, AxisDirection.X_POS, AxisDirection.X_NEG, predicate, listener));
         airBlocks.addAll(foundXBlock);
         for (BlockPos xPos : foundXBlock) {
-            foundZForXBlock.addAll(scanLine(xPos, AxisDirection.Z_POS, AxisDirection.Z_NEG, predicate, listener));
-            airBlocks.addAll(foundZForXBlock);
+            airBlocks.addAll(scanLine(xPos, AxisDirection.Y_POS, AxisDirection.Y_NEG, predicate, listener));
+        }
+
+        for (BlockPos xPos : foundXBlock) {
+            List<BlockPos> zBlocksForThisX = scanLine(xPos, AxisDirection.Z_POS, AxisDirection.Z_NEG, predicate, listener);
+            foundZForXBlock.addAll(zBlocksForThisX);
+            airBlocks.addAll(zBlocksForThisX);
         }
         for (BlockPos xPos : foundZForXBlock) {
             airBlocks.addAll(scanLine(xPos, AxisDirection.Y_POS, AxisDirection.Y_NEG, predicate, listener));
