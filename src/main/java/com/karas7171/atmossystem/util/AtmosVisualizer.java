@@ -1,16 +1,14 @@
 package com.karas7171.atmossystem.util;
 
+import com.karas7171.atmossystem.init.ModParticles;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-@EventBusSubscriber(modid = "atmossystem")
 public class AtmosVisualizer {
 
     private static final Queue<VisualTask> VISUAL_QUEUE = new ConcurrentLinkedDeque<>();
@@ -37,14 +35,12 @@ public class AtmosVisualizer {
         double y = pos.getY() + 0.5;
         double z = pos.getZ() + 0.5;
 
-        DustParticleOptions dust = new DustParticleOptions(0x0000FF, 1.0f);
-
         level.sendParticles(
-                dust,
+                ModParticles.O2_PARTICLE.get(),
                 x, y, z,
-                1,
+                0,
                 0, 0, 0,
-                0.0
+                0.01
         );
     }
 
@@ -53,18 +49,12 @@ public class AtmosVisualizer {
         double y = start.getY() + 0.5;
         double z = start.getZ() + 0.5;
 
-        double dx = end.getX() - start.getX();
-        double dy = end.getY() - start.getY();
-        double dz = end.getZ() - start.getZ();
-
-        DustParticleOptions dust = new DustParticleOptions(0x0000FF, 1.0f);
-
         level.sendParticles(
-            dust,
+            ModParticles.O2_PARTICLE.get(),
             x, y, z,
             0,
-            dx, dy, dz,
-            0.5
+            0, 0, 0,
+            0.01
         );
     }
 

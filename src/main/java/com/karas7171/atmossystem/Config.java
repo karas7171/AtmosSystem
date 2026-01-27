@@ -10,12 +10,10 @@ public class Config {
     // ========== СПЕЦИФИКАЦИЯ КОНФИГА ==========
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    // Объявление настроек (стандартный паттерн)
     public static final ModConfigSpec.BooleanValue ENABLE_DEBUG_LOG;
     public static final ModConfigSpec.IntValue MAGIC_NUMBER;
     public static final ModConfigSpec.ConfigValue<String> SYSTEM_NAME;
 
-    // Кешированные значения (оптимизация)
     public static boolean enableDebugLog;
     public static int magicNumber;
     public static String systemName;
@@ -43,9 +41,7 @@ public class Config {
     public static final ModConfigSpec SPEC;
 
     // ========== МЕТОД РЕГИСТРАЦИИ ==========
-    // СТАНДАРТНЫЙ метод, как и у ModItems
     public static void register(IEventBus modEventBus) {
-        // Регистрируем обработчик события загрузки конфига
         modEventBus.addListener(Config::onConfigLoad);
     }
 

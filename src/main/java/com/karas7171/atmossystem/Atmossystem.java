@@ -2,6 +2,8 @@ package com.karas7171.atmossystem;
 
 import com.karas7171.atmossystem.init.ModCommands;
 import com.karas7171.atmossystem.init.ModItems;
+import com.karas7171.atmossystem.init.ModParticles;
+import com.karas7171.atmossystem.util.AtmosVisualizer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -20,39 +22,30 @@ public class Atmossystem {
 
     // ========== КОНСТРУКТОР МОДА ==========
     public Atmossystem(IEventBus modEventBus, ModContainer modContainer) {
-        // === ШАГ 1: РЕГИСТРАЦИЯ ВСЕХ КОМПОНЕНТОВ ===
-        // ВСЁ регистрируется через переданный IEventBus
-        // Это ОФИЦИАЛЬНЫЙ ПАТТЕРН NeoForge
 
-        // 1. Регистрируем предметы (наш менеджер предметов)
         ModItems.register(modEventBus);
 
-        // 2. Регистрируем конфиг (ТАК ЖЕ, как предметы!)
-        Config.register(modEventBus);  // ← ВОТ ОН, ПРАВИЛЬНЫЙ ВЫЗОВ!
+        Config.register(modEventBus);
 
-        // 3. Регистрируем блоки (когда появятся)
-        // ModBlocks.register(modEventBus);
+        ModParticles.PARTICLES.register(modEventBus);
 
-        // === ШАГ 2: СТАНДАРТНЫЕ НАСТРОЙКИ ===
         modEventBus.addListener(this::commonSetup);
         NeoForge.EVENT_BUS.register(this);
 
-        LOGGER.info("✅ Мод '{}' инициализирован. Все компоненты зарегистрированы.", MOD_ID);
-
         NeoForge.EVENT_BUS.register(ModCommands.class);
+        NeoForge.EVENT_BUS.register(AtmosVisualizer.class);
+
+        LOGGER.info("✅ Мод '{}' инициализирован. Все компоненты зарегистрированы.", MOD_ID);
     }
 
     // ========== COMMON SETUP ==========
     private void commonSetup(final FMLCommonSetupEvent event) {
-        // Выполняется после регистрации ВСЕГО
-        // Здесь можно: сетевые пакеты, межмодовое взаимодействие и т.д.
         LOGGER.info("⚙️ Common setup выполнен.");
     }
 
     // ========== СЕРВЕРНЫЕ СОБЫТИЯ ==========
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        // Выполняется при запуске сервера/одиночного мира
         LOGGER.info("🌍 Сервер запущен.");
     }
 
