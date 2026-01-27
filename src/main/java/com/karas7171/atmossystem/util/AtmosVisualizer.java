@@ -6,45 +6,41 @@ import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AtmosVisualizer {
 
-    private static final Queue<VisualTask> VISUAL_QUEUE = new ConcurrentLinkedDeque<>();
+    private static final Map<UUID, Queue<VisualTask>> VISUAL_TASKS = new ConcurrentHashMap<>();
 
-    public static void addVisualTask(BlockPos pos, ServerLevel level) {
-        VISUAL_QUEUE.add(new VisualTask(pos, level));
+    public static void addVisualTask(BlockPos pos, ServerLevel level, UUID taskID) {
+        Queue<VisualTask> queue = VISUAL_TASKS.computeIfAbsent(taskID, k -> new LinkedList<>());
+        queue.add(new VisualTask(pos, level));
     }
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (!VISUAL_QUEUE.isEmpty()) {
-            for (int i = 0; i < 5; i++) {
-                VisualTask task = VISUAL_QUEUE.poll();
+        if (VISUAL_TASKS.isEmpty()) return;
+
+        List<Map.Entry<UUID, Queue<VisualTask>>> entries = new ArrayList<>(VISUAL_TASKS.entrySet());
+
+        for (Map.Entry<UUID, Queue<VisualTask>> entry : entries) {
+            Queue<VisualTask> queue = entry.getValue();
+            if (queue.isEmpty()) continue;
+
+            for (int i = 0; i < 2; i++) {
+                VisualTask task = queue.poll();
                 if (task == null) break;
-                drawSinglePoint(task.level(), task.pos());
+                visualize(task.level(), task.pos());
             }
+
+            if (queue.isEmpty()) VISUAL_TASKS.remove(entry.getKey());
         }
     }
 
     record VisualTask(BlockPos pos, ServerLevel level) {}
 
-    private static void drawSinglePoint(ServerLevel level, BlockPos pos) {
-        double x = pos.getX() + 0.5;
-        double y = pos.getY() + 0.5;
-        double z = pos.getZ() + 0.5;
-
-        level.sendParticles(
-                ModParticles.O2_PARTICLE.get(),
-                x, y, z,
-                0,
-                0, 0, 0,
-                0.01
-        );
-    }
-
-    public static void visualize(ServerLevel level, BlockPos start, BlockPos end) {
+    public static void visualize(ServerLevel level, BlockPos start) {
         double x = start.getX() + 0.5;
         double y = start.getY() + 0.5;
         double z = start.getZ() + 0.5;
@@ -58,7 +54,7 @@ public class AtmosVisualizer {
         );
     }
 
-    public static void clearVISUAL_QUEUE() {
-        VISUAL_QUEUE.clear();
+    public static void clearVISUAL_QUEUE(UUID taskId) {
+        VISUAL_TASKS.remove(taskId);
     }
 }

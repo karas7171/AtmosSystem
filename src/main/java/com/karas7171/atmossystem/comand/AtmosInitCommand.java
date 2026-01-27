@@ -16,6 +16,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
+import java.util.UUID;
+
 public class AtmosInitCommand {
     public static ArgumentBuilder<CommandSourceStack, ?> register() {
         var axial = Commands.literal("axial")
@@ -53,6 +55,7 @@ public class AtmosInitCommand {
         Level level = player.level();
         BlockPos pos = player.blockPosition();
         ServerLevel serverLevel = player.level();
+        UUID taskID = player.getUUID();
         if (AtmosManager.get().getZone(pos) != null) {
             source.sendFailure(Component.literal("Зона уже инициализирована"));
             return 0;
@@ -61,10 +64,10 @@ public class AtmosInitCommand {
         AtmosProgressListener listener = null;
 
         if (isVisual) {
-            AtmosVisualizer.clearVISUAL_QUEUE();
+            AtmosVisualizer.clearVISUAL_QUEUE(taskID);
             listener = isSlow
-                ? (current, next) -> AtmosVisualizer.addVisualTask(next, serverLevel)
-                : (current, next) -> AtmosVisualizer.visualize(serverLevel, current, next);
+                ? (current, next) -> AtmosVisualizer.addVisualTask(next, serverLevel, taskID)
+                : (current, next) -> AtmosVisualizer.visualize(serverLevel, next);
             }
 
         long start = System.nanoTime();
