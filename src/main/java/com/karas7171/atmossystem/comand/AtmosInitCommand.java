@@ -54,7 +54,7 @@ public class AtmosInitCommand {
         ServerPlayer player = source.getPlayerOrException();
         Level level = player.level();
         BlockPos pos = player.blockPosition();
-        ServerLevel serverLevel = player.level();
+        ServerLevel serverLevel = source.getLevel();
         UUID taskID = player.getUUID();
         if (AtmosManager.get().getZone(pos) != null) {
             source.sendFailure(Component.literal("Зона уже инициализирована"));

@@ -57,4 +57,12 @@ public class AtmosVisualizer {
     public static void clearVISUAL_QUEUE(UUID taskId) {
         VISUAL_TASKS.remove(taskId);
     }
+
+    public static void runViewCycle(ServerLevel level, List<BlockPos> airBlocks, BlockPos StartPos) {
+        for (BlockPos pos : airBlocks) {
+            if (pos.distSqr(StartPos) <= 1024) {
+                visualize(level, pos);
+            }
+        }
+    }
 }
