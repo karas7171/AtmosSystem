@@ -18,7 +18,6 @@ public class AtmosZoneFactory {
         return new AtmosZone(
                 ID,
                 zoneBounds,
-                101.325f,
                 293.15f,
                 41.57f,
                 airBlocks

@@ -67,4 +67,8 @@ public class AtmosManager {
         int ID = zone.getID();
         atmosZones.remove(ID);
     }
+
+    public Map<Integer, AtmosZone> getAllZones() {
+        return atmosZones;
+    }
 }

@@ -3,8 +3,6 @@ package com.karas7171.atmossystem.util;
 import com.karas7171.atmossystem.init.ModParticles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,15 +16,18 @@ public class AtmosVisualizer {
         queue.add(new VisualTask(pos, level));
     }
 
-    @SubscribeEvent
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void tick() {
         if (VISUAL_TASKS.isEmpty()) return;
 
-        List<Map.Entry<UUID, Queue<VisualTask>>> entries = new ArrayList<>(VISUAL_TASKS.entrySet());
+        var iterator = VISUAL_TASKS.entrySet().iterator();
 
-        for (Map.Entry<UUID, Queue<VisualTask>> entry : entries) {
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
             Queue<VisualTask> queue = entry.getValue();
-            if (queue.isEmpty()) continue;
+            if (queue.isEmpty()) {
+                iterator.remove();
+                continue;
+            }
 
             for (int i = 0; i < 2; i++) {
                 VisualTask task = queue.poll();
@@ -34,7 +35,7 @@ public class AtmosVisualizer {
                 visualize(task.level(), task.pos());
             }
 
-            if (queue.isEmpty()) VISUAL_TASKS.remove(entry.getKey());
+            if (queue.isEmpty()) iterator.remove();
         }
     }
 
