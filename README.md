@@ -1,140 +1,56 @@
-# **README (RU) — AtmosSystem**
+# **AtmosSystem**
 
-## 🚀 **AtmosSystem**
+**AtmosSystem** is a high-performance, standalone atmospheric simulation engine for Minecraft (NeoForge), designed from the ground up with a focus on architecture, computational efficiency, and realistic gas behavior.
 
-**AtmosSystem** — это экспериментальная система симуляции газов, написанная с нуля на **чистой Java** и **NeoForge**, разрабатываемая как альтернативное ядро атмосферы для Minecraft-мода
-**Space Station Craft 14 (SSC14)**:
-[https://github.com/SpaceKyyyst/Space-Station-Craft-14/](https://github.com/SpaceKyyyst/Space-Station-Craft-14/)
+## **🎯 Project Goal**
 
-Проект сосредоточен на **архитектуре, производительности и правильной модели газов**, а не на визуальных или игровых механиках.
+The goal is to provide a scalable gas simulation system that moves away from traditional "block-by-block" ticking in favor of a much more efficient **Zone-based** approach.
 
----
+## **🧠 Core Concepts**
 
-## 🎯 **Цель проекта**
+### **1. Zone-Based Simulation**
 
-Создать **высокопроизводительную и масштабируемую** систему атмосферы, которая:
+Instead of expensive per-block logic, the system identifies airtight environments using an optimized **flood-fill** algorithm.
 
-* не использует поблочную симуляцию каждый тик
-* работает на основе **зон (комнат)**
-* способна обрабатывать большие помещения без падения TPS
-* легко встраивается в существующий мод (включая MCreator-проекты)
-* моделирует давление, температуру и смеси газов
+* Spaces are grouped into **Atmospheric Zones**.
+* Each zone is processed as a single unit for global equilibrium.
+* Significantly reduces CPU overhead for large-scale builds.
 
-Система сначала создаётся как отдельное ядро, чтобы добиться правильной архитектуры и хорошей производительности.
-Интеграция в SSC14 планируется после стабилизации ядра.
+### **2. 1D Array Flattening & Cache Locality**
 
----
+To achieve maximum performance, each zone's 3D bounding box is flattened into a **1D primitive array**.
 
-## 🧠 **Основные идеи**
+* **Zero Object Overhead:** No `HashMap` or `BlockPos` lookups during the simulation loop.
+* **Memory Efficiency:** High cache locality ensures fast data access.
+* **Optimized Neighbor Logic:** Spatial relationships are calculated using fast index math.
 
-### ⭐ 1. Симуляция по зонам (Room / Zone Based Simulation)
+## **🧪 Simulation Model**
 
-Вместо дорогой поблочной логики:
+Each atmospheric cell tracks:
 
-* определяется **герметичное помещение** через flood-fill
-* помещение становится **зоной атмосферы**
-* зона обрабатывается как единая система
+* **Pressure & Temperature**
+* **Gas Mixtures (Concentration maps)**
+* **Static/Solid state flags** (to handle walls and vacuum)
 
-Это предотвращает резкие скачки времени обработки серверного тика.
+## **🛠 Tech Stack**
 
----
+* **Java 17/21**
+* **NeoForge** (as the integration layer)
+* **Independent Core:** The simulation engine is decoupled from Minecraft's internal classes, making it easier to maintain and port.
 
-### ⭐ 2. Газовая сетка на основе 1D-массива
+## **📂 Project Structure**
 
-Каждая зона определяется через flood-fill и представляет собой область произвольной формы.
-Для хранения и симуляции по зоне вычисляется её 3D bounding box (min/max по X/Y/Z),
-который разворачивается в 1D-массив.
+* `core/` — Gas grid, indexers, and solvers.
+* `gas/` — Gas types and mixture logic.
+* `zone/` — Room detection and flood-fill implementation.
 
-Это даёт:
+## **🚧 Development Status**
 
-* быстрый доступ к ячейкам
-* отсутствие `HashMap` и `BlockPos` внутри симуляции
-* хорошую cache locality
-* стабильный и предсказуемый алгоритм соседства
+* [x] Architectural design and data structures.
+* [x] Optimized 1D grid indexing.
+* [ ] Gas solver (Convection & Diffusion).
+* [ ] Zone merging/splitting logic.
 
-Так как комнаты в Minecraft могут иметь произвольную форму, зона хранится в виде
-прямоугольного bounding box. Ячейки, которые находятся внутри bounding box, но не
-относятся к комнате, помечаются как `solid` и исключаются из симуляции.
-Это упрощает расчёт соседей и значительно повышает производительность.
+## **📜 License**
 
----
-
-## 🧪 **Модель симуляции**
-
-Каждая ячейка содержит:
-
-* давление
-* температуру
-* концентрации газов (смеси)
-* флаг `solid` (стена / пустота)
-
-Симуляция:
-
-* работает только для `solid = false`
-* выполняет газообмен между соседними ячейками
-* выполняться до равновесия зоны
-* не расходует тики, когда зона статична
-
----
-
-## 🧩 **Связь с SSC14**
-
-* проект **не является форком** SSC14
-* он разрабатывается **независимо**
-* цель — позже встроить систему в существующий мод, переведя его на более эффективную архитектуру
-
-Такой подход позволяет:
-
-* быстро тестировать отдельные компоненты
-* не зависеть от MCreator
-
----
-
-## 🛠 **Технологии**
-
-* Java
-* NeoForge (как движок моддинга)
-* ядро симуляции изолировано от игровых классов Minecraft и взаимодействует с игрой через интеграционный слой
-* MCreator будет использоваться только как оболочка при интеграции
-
----
-
-## 📂 **Структура проекта**
-
-```
-src/
-  main/java/
-    core/       — Газовая сетка, индексатор, солверы
-    gas/        — Типы газов, смеси
-    zone/       — Поиск зон, flood-fill
-    event/      — События для будущей интеграции
-```
-
----
-
-## 🚧 **Статус разработки**
-
-**Сейчас:**
-
-* проект на стадии архитектурного проектирования
-* работа над сеткой, зонами и минимальным солвером
-* экспериментальные структуры данных
-
-**Планируется:**
-
-* газовый солвер
-* конвекция, теплопередача
-* объединение/разделение зон
-* визуальный слой
-* интеграция в SSC14
-* API для добавления кастомных газов
-
----
-
-## 📜 Лицензия
-
-Лицензия: **MIT**
-
-Это означает:
-
-* любой может использовать, модифицировать и встраивать эту систему
+Distributed under the **MIT License**.
